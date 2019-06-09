@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<!-- saved from url=(0096)file:///C:/Users/YMBo/Desktop/%E6%96%B0%E5%BB%BA%E6%96%87%E4%BB%B6%E5%A4%B9/axios/dist/test.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./dist/axios.js"></script>
+<script>
+    var CancelToken = axios.CancelToken;
+    var source = '';
+    function send() {
+    	// 写在这里的原因
+    	// 因为这个source是一个对象，里面包含一个CancelToken实例和，cancel取消请求的方法
+    	// 每次调用cancel函数会生成一个Cancel的实例同时dispatchRequesth函数会根据是否含有Cancel实例来中断掉axios请求，
+    	// 只要调用了一次source那么，这个Cancel实例是一直存在的，所以会出现CancelToken.source()写在外面调用过一次source.cancel('还就那个取消');后，以后的send()函数调用都会触发axios中断
+    	// 所以需要每次请求的时候要重新生成一个CancelToken实例
+    	source = CancelToken.source()
+        return axios.get('http://localhost:3000/api', {
+        	params:{use:'参数'},
+            cancelToken: source.token
+        }).then(r => {
+            console.log(r)
+            return r
+        })
+    }
+    function cancel() {
+        source.cancel('还就那个取消');
+    }
+</script></head>
+<body>
+    <button onclick="send()">发送</button>
+    <button onclick="sendPost()">发送POST</button>
+    <button onclick="cancel()">取消</button>
+	<button onclick="all2()">还就那个连环点击</button>
+
+</body>
+<script>
+    // function all2(){
+    // 	axios.all([sendPost(), send()])
+		  // .then(axios.spread(function (acct, perms) {
+		  //   // 两个请求现在都执行完成
+		  //   console.log(2)
+		  //   console.log(acct,perms)
+		  // }));
+    // }
+    // function sendPost(){
+    // 	source = CancelToken.source()
+    //     return axios.get('http://localhost:3000/api2',{
+    //     	use:'参数'
+    //     }, {
+    //         cancelToken: source.token
+    //     }).then(r => {
+    //         console.log(r)
+    //         return r
+    //     })
+    // }
+</script>
+</html>
